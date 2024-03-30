@@ -17,6 +17,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -33,6 +34,7 @@ fun ButtonsUI(game: Game) {
     // State to hold the text value
     var text by remember { mutableStateOf(game.word) }
     val buttonColors = remember { mutableStateOf(List(4) { List(4) { Color.Blue } }) }
+    var score by remember { mutableIntStateOf(0) }
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
         modifier = Modifier.padding(16.dp)
@@ -64,6 +66,7 @@ fun ButtonsUI(game: Game) {
             })
             SubmitButton(onSubmitClicked = {
                 game.submitWord()
+                score = game.score
                 text = ""
                 game.clearState()
                 buttonColors.value = List(4) { List(4) { Color.Blue } }
@@ -77,6 +80,7 @@ fun ButtonsUI(game: Game) {
         ) {
             ScoreText() // ScoreText takes the left side of the first line
             Spacer(modifier = Modifier.weight(1f)) // Add a spacer to push the NewGameButton to the right
+            ScoreNum(num = score)
         }
         Row(
             modifier = Modifier.fillMaxWidth(),

@@ -137,7 +137,9 @@ class Game{
 
 
 
-    fun showToast(str : String){}
+    fun showToast(str : String){
+        Log.d("Game Debug", str)
+    }
 
 
 }

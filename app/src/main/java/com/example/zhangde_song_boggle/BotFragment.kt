@@ -27,6 +27,11 @@ fun ScoreText() {
 }
 
 @Composable
+fun ScoreNum(num: Int){
+    Text(text = num.toString())
+}
+
+@Composable
 fun NewGameButton(){
     val context = LocalContext.current
     Button(
