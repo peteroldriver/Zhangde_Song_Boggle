@@ -32,10 +32,13 @@ fun ScoreNum(num: Int){
 }
 
 @Composable
-fun NewGameButton(){
+fun NewGameButton(newGame: () -> Unit){
     val context = LocalContext.current
     Button(
-        onClick = { Toast.makeText(context, "NewGame Button clicked!", Toast.LENGTH_SHORT).show()},
+        onClick = {
+            newGame()
+            Toast.makeText(context, "NewGame Button clicked!", Toast.LENGTH_SHORT).show()
+                  },
         colors = ButtonDefaults.buttonColors(
             Color.Transparent
         ),

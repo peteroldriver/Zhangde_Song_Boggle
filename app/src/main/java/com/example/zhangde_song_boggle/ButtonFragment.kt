@@ -1,6 +1,5 @@
 package com.example.zhangde_song_boggle
 
-import android.util.Log
 import android.widget.Toast
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
@@ -33,6 +32,7 @@ import com.example.zhangde_song_boggle.Game.Game
 fun ButtonsUI(game: Game) {
     // State to hold the text value
     var text by remember { mutableStateOf(game.word) }
+    var board by remember {mutableStateOf(game.getBoard())}
     val buttonColors = remember { mutableStateOf(List(4) { List(4) { Color.Blue } }) }
     var score by remember { mutableIntStateOf(0) }
     Column(
@@ -43,7 +43,7 @@ fun ButtonsUI(game: Game) {
         for (i in 0 until 4) {
             Row {
                 for (j in 0 until 4) {
-                    LetterButton(i, j, game, buttonColors) { newWord ->
+                    LetterButton(i, j, game, board, buttonColors) { newWord ->
                         // Update text when a button is clicked
                         text += newWord.toString()
                     }
@@ -87,7 +87,13 @@ fun ButtonsUI(game: Game) {
             verticalAlignment = Alignment.CenterVertically
         ) {
             Spacer(modifier = Modifier.weight(1f)) // Add a spacer to push the ScoreText to the left
-            NewGameButton() // NewGameButton takes the right side of the second line
+            NewGameButton(newGame = {
+                game.resetGame()
+                board = game.getBoard()
+                score = game.score
+                buttonColors.value = List(4) { List(4) { Color.Blue } }
+                text = game.word
+            }) // NewGameButton takes the right side of the second line
         }
     }
 }
@@ -105,6 +111,7 @@ fun LetterButton(
     y: Int,
     x: Int,
     game: Game,
+    board: Array<CharArray>,
     buttonColors: MutableState<List<List<Color>>>,
     param: (Any) -> Unit
 ){
@@ -120,7 +127,7 @@ fun LetterButton(
                         }
                     }
                 }
-                param(game.getBoard()[y][x].toString())
+                param(board[y][x].toString())
             }
         },
         colors = ButtonDefaults.buttonColors(

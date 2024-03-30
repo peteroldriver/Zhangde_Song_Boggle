@@ -10,7 +10,7 @@ import java.io.InputStreamReader
 
 class Game{
     private val boardSize = 4
-    private val board = Array(boardSize) { CharArray(boardSize) }
+    private var board = Array(boardSize) { CharArray(boardSize) }
     private var visited = Array(boardSize) { BooleanArray(boardSize) }
     var score = 0
     val dictionary: Set<String> = mutableSetOf<String>()
@@ -41,6 +41,22 @@ class Game{
                 board[row][col] = alphabet.random()
             }
         }
+    }
+
+    fun createBoard(){
+        board = Array(boardSize) { CharArray(boardSize) }
+        val a = ('A'..'Z').toList()
+        for(row in 0 until boardSize){
+            for(col in 0 until boardSize){
+                board[row][col] = a.random()
+            }
+        }
+    }
+
+    fun resetGame(){
+        createBoard()
+        score = 0
+        clearState()
     }
 
     fun getBoard():Array<CharArray>{
