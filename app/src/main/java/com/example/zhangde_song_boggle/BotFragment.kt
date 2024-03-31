@@ -19,16 +19,18 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 
 @Composable
 fun ScoreText() {
-    Text(text = "Score")
-
+    Text(text = "Score: ",
+        fontSize = 32.sp)
 }
 
 @Composable
 fun ScoreNum(num: Int){
-    Text(text = num.toString())
+    Text(text = num.toString(),
+        fontSize = 46.sp)
 }
 
 @Composable
@@ -49,7 +51,8 @@ fun NewGameButton(newGame: () -> Unit){
     ) {
         Text(
             text = "New Game",
-            color = Color.Black
+            color = Color.Black,
+            fontSize = 32.sp
         )
     }
 }

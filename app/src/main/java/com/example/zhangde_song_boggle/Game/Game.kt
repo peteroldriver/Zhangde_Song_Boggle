@@ -2,6 +2,7 @@ package com.example.zhangde_song_boggle.Game
 
 import android.content.Context
 import android.util.Log
+import android.widget.Toast
 import com.example.zhangde_song_boggle.R
 import java.io.BufferedReader
 import java.io.File
@@ -9,15 +10,15 @@ import java.io.InputStream
 import java.io.InputStreamReader
 
 class Game{
-    private val boardSize = 4
+    private val boardSize = 5
     private var board = Array(boardSize) { CharArray(boardSize) }
     private var visited = Array(boardSize) { BooleanArray(boardSize) }
     var score = 0
-    val dictionary: Set<String> = mutableSetOf<String>()
+    val dictionary =  mutableSetOf<String>()
     private var lastX = -1
     private var lastY = -1
     var word = ""
-    private var ansSet: Set<String> = mutableSetOf<String>()
+    private var ansSet = mutableSetOf<String>()
 
     fun loadDictionary(context : Context){
         var string: String?
@@ -28,8 +29,9 @@ class Game{
         reader = BufferedReader(InputStreamReader(inputStream))
         while (true) {
             string = reader.readLine()
+            Log.d("Load Dictionary", "Add word $string")
             if (string == null) break
-            dictionary.plus(string)
+            dictionary.add(string)
         }
 }
 
@@ -63,34 +65,35 @@ class Game{
         return board
     }
 
-    fun submitWord(): Boolean {
+    fun submitWord(context: Context): Boolean {
 
         if (word.length < 4) {
-            showToast("Word must be at least 4 characters long.")
+            showToast(context, "Word must be at least 4 characters long.")
             return false
         }
 
         if(word in ansSet){
-            showToast("Word has already be entered before.")
+            showToast(context, "Word has already be entered before.")
             return false
         }
 
-        if (!isValidWord(word)) {
+        if (!isValidWord(context, word)) {
             score -= 10
-            showToast("Incorrect word! -10 points.")
+            if(score<0) score=0
+            showToast(context, "Incorrect word! -10 points.")
             return false
         }
 
         val wordScore = calculateScore(word)
         score += wordScore
-        showToast("Correct word! +${wordScore} points.")
+        showToast(context, "Correct word! +${wordScore} points.")
         return true
     }
 
-    private fun isValidWord(word: String): Boolean {
+    private fun isValidWord(context: Context, word: String): Boolean {
         if (!dictionary.contains(word.toLowerCase())) return false
 
-        val uniqueLetters = word.toLowerCase().toSet()
+        val uniqueLetters = word.toLowerCase()
         val vowels = setOf('a', 'e', 'i', 'o', 'u')
         var vowelCount = 0
         var consonantCount = 0
@@ -103,19 +106,26 @@ class Game{
             }
         }
 
-        return vowelCount >= 2 && consonantCount > 0
+        if( vowelCount >= 2 && consonantCount > 0){
+            return true
+        }
+        else{
+            showToast(context, "vowel number < 2 or consonant ")
+            return false
+        }
     }
 
     private fun calculateScore(word: String): Int {
-            ansSet.plus(word)
-            score = 0
+            ansSet.add(word)
             val consonants = setOf('s', 'z', 'p', 'x', 'q')
+            var curScore = 0
             var double =  false
             for (letter in word.toLowerCase()) {
                 if (letter in consonants) double=true
-                score += if (letter in "aeiou") 5 else 1
+                curScore += if (letter in "aeiou") 5 else 1
             }
-        return score
+            if(double) curScore*2
+        return score+curScore
     }
 
     fun isPositionClickable(x2: Int, y2: Int): Boolean {
@@ -153,8 +163,8 @@ class Game{
 
 
 
-    fun showToast(str : String){
-        Log.d("Game Debug", str)
+    fun showToast(context: Context, str : String){
+        Toast.makeText(context, str, Toast.LENGTH_SHORT)
     }
 
 

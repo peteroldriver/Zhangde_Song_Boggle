@@ -1,5 +1,6 @@
 package com.example.zhangde_song_boggle
 
+import android.content.Context
 import android.widget.Toast
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
@@ -29,20 +30,20 @@ import androidx.compose.ui.unit.sp
 import com.example.zhangde_song_boggle.Game.Game
 
 @Composable
-fun ButtonsUI(game: Game) {
+fun ButtonsUI(context: Context, game: Game) {
     // State to hold the text value
     var text by remember { mutableStateOf(game.word) }
     var board by remember {mutableStateOf(game.getBoard())}
-    val buttonColors = remember { mutableStateOf(List(4) { List(4) { Color.Blue } }) }
+    val buttonColors = remember { mutableStateOf(List(5) { List(5) { Color.Blue } }) }
     var score by remember { mutableIntStateOf(0) }
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
         modifier = Modifier.padding(16.dp)
     ) {
         Greeting(name = "Hit BUttons to Form Words")
-        for (i in 0 until 4) {
+        for (i in 0 until 5) {
             Row {
-                for (j in 0 until 4) {
+                for (j in 0 until 5) {
                     LetterButton(i, j, game, board, buttonColors) { newWord ->
                         // Update text when a button is clicked
                         text += newWord.toString()
@@ -62,14 +63,14 @@ fun ButtonsUI(game: Game) {
             ClearButton(resetState = {
                 text = ""
                 game.clearState()
-                buttonColors.value = List(4) { List(4) { Color.Blue } }
+                buttonColors.value = List(5) { List(5) { Color.Blue } }
             })
             SubmitButton(onSubmitClicked = {
-                game.submitWord()
+                game.submitWord(context)
                 score = game.score
                 text = ""
                 game.clearState()
-                buttonColors.value = List(4) { List(4) { Color.Blue } }
+                buttonColors.value = List(5) { List(5) { Color.Blue } }
             }
             )
         }
@@ -79,8 +80,9 @@ fun ButtonsUI(game: Game) {
             verticalAlignment = Alignment.CenterVertically
         ) {
             ScoreText() // ScoreText takes the left side of the first line
-            Spacer(modifier = Modifier.weight(1f)) // Add a spacer to push the NewGameButton to the right
             ScoreNum(num = score)
+            Spacer(modifier = Modifier.weight(1f)) // Add a spacer to push the NewGameButton to the right
+
         }
         Row(
             modifier = Modifier.fillMaxWidth(),
@@ -91,7 +93,7 @@ fun ButtonsUI(game: Game) {
                 game.resetGame()
                 board = game.getBoard()
                 score = game.score
-                buttonColors.value = List(4) { List(4) { Color.Blue } }
+                buttonColors.value = List(5) { List(5) { Color.Blue } }
                 text = game.word
             }) // NewGameButton takes the right side of the second line
         }
@@ -102,7 +104,8 @@ fun ButtonsUI(game: Game) {
     fun Greeting(name: String, modifier: Modifier = Modifier) {
         Text(
             text = "Enter Hit Then Click Submit",
-            modifier = modifier
+            modifier = modifier,
+            fontSize = 32.sp
         )
     }
 
@@ -140,7 +143,8 @@ fun LetterButton(
     ) {
         Text(
             text = game.getBoard()[y][x].toString(),
-            color = Color.Black
+            color = Color.Black,
+            fontSize = 24.sp
         )
     }
 }
@@ -161,7 +165,8 @@ fun ClearButton(resetState: () -> Unit) {
     ) {
         Text(
             text = "Clear",
-            color = Color.Black
+            color = Color.Black,
+            fontSize = 32.sp
         )
     }
 }
@@ -184,7 +189,8 @@ fun ClearButton(resetState: () -> Unit) {
         ) {
             Text(
                 text = "Submit",
-                color = Color.Black
+                color = Color.Black,
+                fontSize = 32.sp
             )
         }
     }
