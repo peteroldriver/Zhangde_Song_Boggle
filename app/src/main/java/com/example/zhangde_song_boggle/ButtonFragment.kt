@@ -1,6 +1,10 @@
 package com.example.zhangde_song_boggle
 
 import android.content.Context
+import android.hardware.Sensor
+import android.hardware.SensorEvent
+import android.hardware.SensorEventListener
+import android.hardware.SensorManager
 import android.widget.Toast
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
@@ -15,6 +19,7 @@ import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Text
 import androidx.compose.ui.Alignment
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
@@ -28,6 +33,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.zhangde_song_boggle.Game.Game
+import kotlin.math.sqrt
 
 @Composable
 fun ButtonsUI(context: Context, game: Game) {
@@ -98,7 +104,47 @@ fun ButtonsUI(context: Context, game: Game) {
             }) // NewGameButton takes the right side of the second line
         }
     }
-}
+
+                // Shake detection
+                val sensorManager = context.getSystemService(Context.SENSOR_SERVICE) as SensorManager
+                val accelerometer: Sensor? = sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER)
+                val shakeListener = object : SensorEventListener {
+                    private val shakeThresholdGravity = 2.7F
+                    private var lastShakeTime: Long = 0
+
+                    override fun onAccuracyChanged(sensor: Sensor?, accuracy: Int) {}
+
+                    override fun onSensorChanged(event: SensorEvent) {
+                        val x = event.values[0]
+                        val y = event.values[1]
+                        val z = event.values[2]
+                        val acceleration = sqrt(x * x + y * y + z * z.toDouble()) - SensorManager.GRAVITY_EARTH
+                        if (acceleration > shakeThresholdGravity) {
+                            val currentTime = System.currentTimeMillis()
+                            if (currentTime - lastShakeTime > 1000) {
+                                lastShakeTime = currentTime
+                                // Call new game function here
+                                game.resetGame()
+                                board = game.getBoard()
+                                score = game.score
+                                buttonColors.value = List(5) { List(5) { Color.Blue } }
+                                text = game.word
+                                Toast.makeText(context, "Shake detected! New Game Start! ", Toast.LENGTH_SHORT).show()
+                            }
+                        }
+                    }
+                }
+
+                // Register shake listener
+                sensorManager.registerListener(shakeListener, accelerometer, SensorManager.SENSOR_DELAY_NORMAL)
+
+                // Dispose the listener when composable is disposed
+                DisposableEffect(Unit) {
+                    onDispose {
+                        sensorManager.unregisterListener(shakeListener)
+                    }
+                }
+            }
 
     @Composable
     fun Greeting(name: String, modifier: Modifier = Modifier) {
